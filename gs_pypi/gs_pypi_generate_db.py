@@ -22,14 +22,22 @@ from g_sorcery.logger import Logger
 
 from .pypi_db import PypiDBGenerator
 
+import portage
+eprefix = portage.settings['EPREFIX']
+
+
 def main():
-    parser = argparse.ArgumentParser(description='Package DB generator for gs-pypi.')
+    parser = argparse.ArgumentParser(
+        description='Package DB generator for gs-pypi.')
     parser.add_argument('db_dirname', help='directory to store DB')
     parser.add_argument('-c', '--count', help='count of records that should be processed',
                         default=None)
-    parser.add_argument('--layout-version', help='DB layout version', default='1')
-    parser.add_argument('--structure-version', help='DB structure version', default='1')
-    parser.add_argument('-f', '--fmt', help='packages file format (json or bson)', default='bson')
+    parser.add_argument('--layout-version',
+                        help='DB layout version', default='1')
+    parser.add_argument('--structure-version',
+                        help='DB structure version', default='1')
+    parser.add_argument(
+        '-f', '--fmt', help='packages file format (json or bson)', default='bson')
 
     args = parser.parse_args(sys.argv[1:])
 
@@ -43,7 +51,7 @@ def main():
 
     logger = Logger()
     cfg_path = None
-    for path in '.', '~', '/etc/g-sorcery':
+    for path in '.', '~', eprefix + '/etc/g-sorcery':
         current = os.path.join(path, "gs-pypi.json")
         if (os.path.isfile(current)):
             cfg_path = path
@@ -71,7 +79,8 @@ def main():
     else:
         os.mkdir(db_name)
     copy_all(os.path.join(temp_dir.name, "pypi/db"), db_name)
-    os.system('tar cvzf ' +  db_name + '.tar.gz ' + db_name)
+    os.system('tar cvzf ' + db_name + '.tar.gz ' + db_name)
+
 
 if __name__ == "__main__":
     sys.exit(main())
